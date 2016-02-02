@@ -179,12 +179,9 @@ if [[ ! -n $JAVA_PATH ]]; then
 fi
 
 if [[ ! -n $JAVA_PATH ]]; then
-	if [[ -e "$TWS_PATH/$TWS_VERSION/.install4j/inst_jre.cfg" ]]; then
-		read JAVA_PATH < $TWS_PATH/$TWS_VERSION/.install4j/inst_jre.cfg
-		JAVA_PATH=$JAVA_PATH/bin
-		echo $JAVA_PATH
-		if [[ ! -e "$JAVA_PATH/java" ]]; then JAVA_PATH= ;fi
-	fi
+	java_executable=$(which java)
+	JAVA_PATH=$(dirname "$java_executable")
+	echo $JAVA_PATH
 fi
 
 if [[ ! -n $JAVA_PATH ]]; then
