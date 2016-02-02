@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
  * This code is based original code by Ken Geis (ken_geis@telocity.com).
  *
  * Amendment history:
- *   Date     Author	           Change # Description
+ *   Date     Author		   Change # Description
  *   -------- -------------------- -------- -----------
  *   20040316 Richard King         1        Handle new .ini file entry IbAutoClosedown.
  *   20040316 Richard King         2        Handle "Accept incoming connection" dialog with changed title.
@@ -150,40 +150,40 @@ import java.util.concurrent.TimeUnit;
  *                                          is 'no', requiring the user to manually confirm each trade.
  *                                 46       Fixed the NewerVersionDialogHandler: the text to be searched for (in current TWS versions)
  *                                          is contained in a JOptionPane, not a JLabel.
- *  20131218 Richard King          47       Modified the AcceptIncomingConnectionDialogHandler to not check the contents of the 
+ *  20131218 Richard King          47       Modified the AcceptIncomingConnectionDialogHandler to not check the contents of the
  *                                          title bar, since this varies with different versions of TWS and is not necessary
  *                                          to successfully identify the dialog.
  *                                 48       Added an AcceptIncomingConnectionAction setting. If set to 'accept', IBController
  *                                          automatically accepts the incoming connection request. If set to 'reject', IBController
  *                                          automatically rejects the incoming connection request. If set to 'manual', IBController
- *                                          does nothing and the user must decide whether to accept or reject the incoming connection 
+ *                                          does nothing and the user must decide whether to accept or reject the incoming connection
  *                                          request. The default is 'accept'.
  *                                 49       Improved handling of the Exit Session Setting dialog. In TWS 942, the caption is only included
  *                                          the first time the dialog is displayed. However TWS always displays the same instance
  *                                          of the dialog, so a reference to the dialog is stored the first time it is displayed, and
  *                                          is used to detect subsequent displays.
- *                                 50       Added a ShowAllTrades setting. If this is set to yes, IBController causes TWS to display the 
+ *                                 50       Added a ShowAllTrades setting. If this is set to yes, IBController causes TWS to display the
  *                                          Trades log at startup, and sets the 'All' checkbox to ensure that the API reports all executions
- *                                          that have occurred during the past week. Moreover, any attempt by the user to change any of the 
- *                                          'Show trades' checkboxes is ignored; similarly if the user closes the Trades log, it is 
+ *                                          that have occurred during the past week. Moreover, any attempt by the user to change any of the
+ *                                          'Show trades' checkboxes is ignored; similarly if the user closes the Trades log, it is
  *                                          immediately re-displayed with the 'All' checkbox set. If set to 'no', IBController does not
  *                                          interact with the Trades log. The default is no.
  *                                 51       Added RECONNECTACCOUNT and RECONNECTDATA commands. RECONNECTACCOUNT causes TWS to disconnect from
- *                                          the IB account server and then reconnect (the same as the user pressing Ctrl-Alt-R). 
- *                                          RECONNECTDATA causes TWS to disconnect from all market data farms and then reconnect (the same 
+ *                                          the IB account server and then reconnect (the same as the user pressing Ctrl-Alt-R).
+ *                                          RECONNECTDATA causes TWS to disconnect from all market data farms and then reconnect (the same
  *                                          as the user pressing Ctrl-Alt-F). Thanks to Cheung Kwok Fai for suggesting this and supplying the
  *                                          relevant code edits.
- *                                 52       Added an ExistingSessionDetectedAction setting. When TWS logs on it checks to see whether the 
+ *                                 52       Added an ExistingSessionDetectedAction setting. When TWS logs on it checks to see whether the
  *                                          account is already logged in. If so it displays a dialog: this setting instructs TWS how to proceed. If set
  *                                          to 'primary', TWS ends the other session and continues with the new session. If set to
- *                                          'secondary', TWS exits so that the other session is unaffected. If set to 'manual', the user must 
+ *                                          'secondary', TWS exits so that the other session is unaffected. If set to 'manual', the user must
  *                                          handle the dialog. The default is 'manual'.
  *                                 53       Change # 45 above has been removed because firstly, it was not correctly implemented, and
  *                                          secondly current versions of TWS enable the user to instruct TWS not to show the order
  *                                          confirmation dialog. The legal restrictions that resulted in one-click trading via the BookTrader
  *                                          being removed in TWS906 appear to have been lifted.
  *                                 54       Added a LogToConsole setting. If set to 'yes', all logging output from IBController is to the console
- *                                          and may be directed into a file using the normal > or >> command line redirection operators. If set to 'no', 
+ *                                          and may be directed into a file using the normal > or >> command line redirection operators. If set to 'no',
  *                                          output from IBController that is logged after it has loaded TWS appears in the TWS logfile. The default is 'no'.
  *  20140228 Richard King          55       Added the ability to run the FIX CTCI gateway. There are these new settings:
  *                                                  FIX                     if yes, use the FIX CTCI login, otherwise the IB API gateway login (default no)
@@ -195,10 +195,10 @@ import java.util.concurrent.TimeUnit;
  *                                          The FIX username and password may also be supplied as the second and third command line args. In
  *                                          this case, the market data connection username and password may be supplied as the fourth and
  *                                          fifth command line args.
- * 
- * With the move to Github, the value of recording details of amendments here is questionable, and this practice has therefore been 
+ *
+ * With the move to Github, the value of recording details of amendments here is questionable, and this practice has therefore been
  * discontinued.
- * 
+ *
  */
 
 public class IBController {
@@ -212,40 +212,42 @@ public class IBController {
 	 *    If length == 2 and args[0] is "encrypt", we print out the encryption of args[1].
      */
     public static void main(String[] args) {
-        load(args, false);
+	load(args, false);
     }
 
     static void load(String[] args, boolean gatewayOnly) {
-        _GatewayOnly = gatewayOnly;
+	_GatewayOnly = gatewayOnly;
 
-        printProperties();
+	printProperties();
 
-        checkArguments(args);
+	checkArguments(args);
 
-        getSettings(args);
+	getSettings(args);
 
-        getTWSUserNameAndPassword(args);
-        getFIXUserNameAndPassword(args);
-        
-        startIBControllerServer();
+	getTWSUserNameAndPassword(args);
+	getFIXUserNameAndPassword(args);
 
-        startShutdownTimerIfRequired();
+	startIBControllerServer();
 
-        createToolkitListener();
-        
-        startSavingTwsSettingsAutomatically();
+	registerShutdownHook();
 
-        startTwsOrGateway();
+	startShutdownTimerIfRequired();
+
+	createToolkitListener();
+
+	startSavingTwsSettingsAutomatically();
+
+	startTwsOrGateway();
     }
 
     public IBController() {
-        super();
+	super();
     }
 
     private static boolean _GatewayOnly;
-    
+
     static boolean isGateway() {
-        return _GatewayOnly;
+	return _GatewayOnly;
     }
 
     /**
@@ -264,7 +266,7 @@ public class IBController {
     /**
      * FIX username - can either be supplied from the .ini file or as args[1]
      * NB: if username is supplied in args[1], then the password must
-     * be in args[2], and the IBAPI username and password may be in 
+     * be in args[2], and the IBAPI username and password may be in
      * args[3] and args[4]. If username is supplied in .ini, then the password must
      * also be in .ini.
      */
@@ -278,279 +280,289 @@ public class IBController {
     private static final List<WindowHandler> _WindowHandlers = new ArrayList<WindowHandler>();
 
     static {
-        createWindowHandlers();
+	createWindowHandlers();
     }
 
     private static void checkArguments(String[] args) {
-        if (args.length == 2) {
-            if (args[0].equalsIgnoreCase("encrypt")) {
-                Utils.logRawToConsole("========================================================================");
-                Utils.logRawToConsole("");
-                Utils.logToConsole("encryption of \"" + args[1] + "\" is \"" +
-                               Encryptor.encrypt(args[1]) + "\"");
-                Utils.logRawToConsole("");
-                Utils.logRawToConsole("========================================================================");
-                System.exit(0);
-            } else {
-                Utils.logError("2 arguments passed, but args[0] is not 'encrypt'. quitting...");
-                System.exit(1);
-            }
-        } else if (args.length == 4 || args.length > 5) {
-                Utils.logError("Incorrect number of arguments passed. quitting...");
-                System.exit(1);
-        }
+	if (args.length == 2) {
+	    if (args[0].equalsIgnoreCase("encrypt")) {
+		Utils.logRawToConsole("========================================================================");
+		Utils.logRawToConsole("");
+		Utils.logToConsole("encryption of \"" + args[1] + "\" is \"" +
+			       Encryptor.encrypt(args[1]) + "\"");
+		Utils.logRawToConsole("");
+		Utils.logRawToConsole("========================================================================");
+		System.exit(0);
+	    } else {
+		Utils.logError("2 arguments passed, but args[0] is not 'encrypt'. quitting...");
+		System.exit(1);
+	    }
+	} else if (args.length == 4 || args.length > 5) {
+		Utils.logError("Incorrect number of arguments passed. quitting...");
+		System.exit(1);
+	}
     }
 
     private static void createToolkitListener() {
-        TwsListener.initialise(_IBAPIUserName, _IBAPIPassword, _FIXUserName, _FIXPassword, _WindowHandlers);
-        Toolkit.getDefaultToolkit().addAWTEventListener(TwsListener.getInstance(), AWTEvent.WINDOW_EVENT_MASK);
+	TwsListener.initialise(_IBAPIUserName, _IBAPIPassword, _FIXUserName, _FIXPassword, _WindowHandlers);
+	Toolkit.getDefaultToolkit().addAWTEventListener(TwsListener.getInstance(), AWTEvent.WINDOW_EVENT_MASK);
     }
 
     private static void createWindowHandlers() {
-        _WindowHandlers.add(new AcceptIncomingConnectionDialogHandler());
-        _WindowHandlers.add(new BlindTradingWarningDialogHandler());
-        _WindowHandlers.add(new ExitSessionFrameHandler());
-        _WindowHandlers.add(new LoginFrameHandler());
-        _WindowHandlers.add(new GatewayLoginFrameHandler());
-        _WindowHandlers.add(new MainWindowFrameHandler());
-        _WindowHandlers.add(new GatewayMainWindowFrameHandler());
-        _WindowHandlers.add(new NewerVersionDialogHandler());
-        _WindowHandlers.add(new NewerVersionFrameHandler());
-        _WindowHandlers.add(new NotCurrentlyAvailableDialogHandler());
-        _WindowHandlers.add(new TipOfTheDayDialogHandler());
-        _WindowHandlers.add(new NSEComplianceFrameHandler());
-        _WindowHandlers.add(new PasswordExpiryWarningFrameHandler());
-        _WindowHandlers.add(new GlobalConfigurationDialogHandler());
-        _WindowHandlers.add(new TradesFrameHandler());
-        _WindowHandlers.add(new ExistingSessionDetectedDialogHandler());
-        _WindowHandlers.add(new ApiChangeConfirmationDialogHandler());
-        _WindowHandlers.add(new SplashFrameHandler());
-        _WindowHandlers.add(new SecurityCodeDialogHandler());
-        _WindowHandlers.add(new ReloginDialogHandler());
+	_WindowHandlers.add(new AcceptIncomingConnectionDialogHandler());
+	_WindowHandlers.add(new BlindTradingWarningDialogHandler());
+	_WindowHandlers.add(new ExitSessionFrameHandler());
+	_WindowHandlers.add(new LoginFrameHandler());
+	_WindowHandlers.add(new GatewayLoginFrameHandler());
+	_WindowHandlers.add(new MainWindowFrameHandler());
+	_WindowHandlers.add(new GatewayMainWindowFrameHandler());
+	_WindowHandlers.add(new NewerVersionDialogHandler());
+	_WindowHandlers.add(new NewerVersionFrameHandler());
+	_WindowHandlers.add(new NotCurrentlyAvailableDialogHandler());
+	_WindowHandlers.add(new TipOfTheDayDialogHandler());
+	_WindowHandlers.add(new NSEComplianceFrameHandler());
+	_WindowHandlers.add(new PasswordExpiryWarningFrameHandler());
+	_WindowHandlers.add(new GlobalConfigurationDialogHandler());
+	_WindowHandlers.add(new TradesFrameHandler());
+	_WindowHandlers.add(new ExistingSessionDetectedDialogHandler());
+	_WindowHandlers.add(new ApiChangeConfirmationDialogHandler());
+	_WindowHandlers.add(new SplashFrameHandler());
+	_WindowHandlers.add(new SecurityCodeDialogHandler());
+	_WindowHandlers.add(new ReloginDialogHandler());
     }
 
     private static String getFIXPasswordFromProperties() {
-        String password = Settings.getString("FIXPassword", "");
-        if (password.length() != 0) {
-            if (isFIXPasswordEncrypted()) password = Encryptor.decrypt(password);
-        }
-        return password;
+	String password = Settings.getString("FIXPassword", "");
+	if (password.length() != 0) {
+	    if (isFIXPasswordEncrypted()) password = Encryptor.decrypt(password);
+	}
+	return password;
     }
 
     private static void getFIXUserNameAndPassword(String[] args) {
-        if (! getFIXUserNameAndPasswordFromArguments(args)) {
-            getFIXUserNameAndPasswordFromProperties();
-        }
+	if (! getFIXUserNameAndPasswordFromArguments(args)) {
+	    getFIXUserNameAndPasswordFromProperties();
+	}
     }
 
     private static String getFIXUserNameFromProperties() {
-        return Settings.getString("FIXLoginId", "");
+	return Settings.getString("FIXLoginId", "");
     }
 
     private static boolean getFIXUserNameAndPasswordFromArguments(String[] args) {
-        if (args.length == 3 || args.length == 5) {
-            _FIXUserName = args[1];
-            _FIXPassword = args[2];
-            return true;
-        } else {
-            return false;
-        }
+	if (args.length == 3 || args.length == 5) {
+	    _FIXUserName = args[1];
+	    _FIXPassword = args[2];
+	    return true;
+	} else {
+	    return false;
+	}
     }
 
     private static void getFIXUserNameAndPasswordFromProperties() {
-        _FIXUserName = getFIXUserNameFromProperties();
-        _FIXPassword = getFIXPasswordFromProperties();
+	_FIXUserName = getFIXUserNameFromProperties();
+	_FIXPassword = getFIXPasswordFromProperties();
     }
 
     private static void getSettings(String[] args) {
-        String iniPath;
-        if (args.length == 0 || args[0].equals("NULL")) {
-            iniPath = getWorkingDirectory() + "IBController." + getComputerUserName() + ".ini";
-        } else {// args.length >= 1
-            iniPath = args[0];
-        }
-        File finiPath = new File(iniPath);
-        if (!finiPath.isFile() || !finiPath.exists()) {
-            Utils.logError("ini file \"" + iniPath +
-                               "\" either does not exist, or is a directory.  quitting...");
-            System.exit(1);
-        }
-        Utils.logToConsole("ini file is " + iniPath);
-        Settings.load(iniPath);
+	String iniPath;
+	if (args.length == 0 || args[0].equals("NULL")) {
+	    iniPath = getWorkingDirectory() + "IBController." + getComputerUserName() + ".ini";
+	} else {// args.length >= 1
+	    iniPath = args[0];
+	}
+	File finiPath = new File(iniPath);
+	if (!finiPath.isFile() || !finiPath.exists()) {
+	    Utils.logError("ini file \"" + iniPath +
+			       "\" either does not exist, or is a directory.  quitting...");
+	    System.exit(1);
+	}
+	Utils.logToConsole("ini file is " + iniPath);
+	Settings.load(iniPath);
     }
 
     private static Date getShutdownTime() {
-        String shutdownTimeSetting = Settings.getString("ClosedownAt", "");
-        if (shutdownTimeSetting.length() == 0) {
-            return null;
-        } else {
-            int shutdownDayOfWeek;
-            int shutdownHour;
-            int shutdownMinute;
-            Calendar cal = Calendar.getInstance();
-            try {
-                cal.setTime((new SimpleDateFormat("E HH:mm")).parse(shutdownTimeSetting));
-                shutdownDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-                shutdownHour = cal.get(Calendar.HOUR_OF_DAY);
-                shutdownMinute = cal.get(Calendar.MINUTE);
-                cal.setTimeInMillis(System.currentTimeMillis());
-                cal.set(Calendar.HOUR_OF_DAY, shutdownHour);
-                cal.set(Calendar.MINUTE, shutdownMinute);
-                cal.set(Calendar.SECOND, 0);
-                cal.add(Calendar.DAY_OF_MONTH,
-                        (shutdownDayOfWeek + 7 -
-                         cal.get(Calendar.DAY_OF_WEEK)) % 7);
-                if (!cal.getTime().after(new Date())) {
-                    cal.add(Calendar.DAY_OF_MONTH, 7);
-                }
-            } catch (ParseException e) {
-                Utils.logError("Invalid ClosedownAt setting: should be: <day hh:mm>   eg Friday 22:00");
-                System.exit(1);
-            }
-            return cal.getTime();
-        }
+	String shutdownTimeSetting = Settings.getString("ClosedownAt", "");
+	if (shutdownTimeSetting.length() == 0) {
+	    return null;
+	} else {
+	    int shutdownDayOfWeek;
+	    int shutdownHour;
+	    int shutdownMinute;
+	    Calendar cal = Calendar.getInstance();
+	    try {
+		cal.setTime((new SimpleDateFormat("E HH:mm")).parse(shutdownTimeSetting));
+		shutdownDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+		shutdownHour = cal.get(Calendar.HOUR_OF_DAY);
+		shutdownMinute = cal.get(Calendar.MINUTE);
+		cal.setTimeInMillis(System.currentTimeMillis());
+		cal.set(Calendar.HOUR_OF_DAY, shutdownHour);
+		cal.set(Calendar.MINUTE, shutdownMinute);
+		cal.set(Calendar.SECOND, 0);
+		cal.add(Calendar.DAY_OF_MONTH,
+			(shutdownDayOfWeek + 7 -
+			 cal.get(Calendar.DAY_OF_WEEK)) % 7);
+		if (!cal.getTime().after(new Date())) {
+		    cal.add(Calendar.DAY_OF_MONTH, 7);
+		}
+	    } catch (ParseException e) {
+		Utils.logError("Invalid ClosedownAt setting: should be: <day hh:mm>   eg Friday 22:00");
+		System.exit(1);
+	    }
+	    return cal.getTime();
+	}
     }
 
     private static String getTWSPasswordFromProperties() {
-        String password = Settings.getString("IbPassword", "");
-        if (password.length() != 0) {
-            if (isPasswordEncrypted()) password = Encryptor.decrypt(password);
-        }
-        return password;
+	String password = Settings.getString("IbPassword", "");
+	if (password.length() != 0) {
+	    if (isPasswordEncrypted()) password = Encryptor.decrypt(password);
+	}
+	return password;
     }
 
     private static String getTWSSettingsDirectory() {
-        String dir = Settings.getString("IbDir", System.getProperty("user.dir"));
-        Utils.logToConsole("TWS settings directory is " + dir);
-        return dir;
+	String dir = Settings.getString("IbDir", System.getProperty("user.dir"));
+	Utils.logToConsole("TWS settings directory is " + dir);
+	return dir;
     }
 
     private static void getTWSUserNameAndPassword(String[] args) {
-        if (! getTWSUserNameAndPasswordFromArguments(args)) {
-            getTWSUserNameAndPasswordFromProperties();
-        }
+	if (! getTWSUserNameAndPasswordFromArguments(args)) {
+	    getTWSUserNameAndPasswordFromProperties();
+	}
     }
 
     private static String getTWSUserNameFromProperties() {
-        return Settings.getString("IbLoginId", "");
+	return Settings.getString("IbLoginId", "");
     }
 
     private static boolean getTWSUserNameAndPasswordFromArguments(String[] args) {
-        if (Settings.getBoolean("FIX", false)) {
-            if (args.length == 5) {
-                _IBAPIUserName = args[3];
-                _IBAPIPassword = args[4];
-                return true;
-            } else {
-                return false;
-            }
-        } else if (args.length == 3) {
-            _IBAPIUserName = args[1];
-            _IBAPIPassword = args[2];
-            return true;
-        } else {
-            return false;
-        }
+	if (Settings.getBoolean("FIX", false)) {
+	    if (args.length == 5) {
+		_IBAPIUserName = args[3];
+		_IBAPIPassword = args[4];
+		return true;
+	    } else {
+		return false;
+	    }
+	} else if (args.length == 3) {
+	    _IBAPIUserName = args[1];
+	    _IBAPIPassword = args[2];
+	    return true;
+	} else {
+	    return false;
+	}
     }
 
     private static void getTWSUserNameAndPasswordFromProperties() {
-        _IBAPIUserName = getTWSUserNameFromProperties();
-        _IBAPIPassword = getTWSPasswordFromProperties();
+	_IBAPIUserName = getTWSUserNameFromProperties();
+	_IBAPIPassword = getTWSPasswordFromProperties();
     }
 
     private static String getComputerUserName() {
-        StringBuilder sb = new StringBuilder(System.getProperty("user.name"));
-        int i;
-        for (i = 0; i < sb.length(); i++) {
-            char c = sb.charAt(i);
-            if ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) {
-                continue;
-            }
-            if (c >= 'A' && c <= 'Z') {
-                sb.setCharAt(i, Character.toLowerCase(c));
-            } else {
-                sb.setCharAt(i, '_');
-            }
-        }
-        return sb.toString();
+	StringBuilder sb = new StringBuilder(System.getProperty("user.name"));
+	int i;
+	for (i = 0; i < sb.length(); i++) {
+	    char c = sb.charAt(i);
+	    if ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) {
+		continue;
+	    }
+	    if (c >= 'A' && c <= 'Z') {
+		sb.setCharAt(i, Character.toLowerCase(c));
+	    } else {
+		sb.setCharAt(i, '_');
+	    }
+	}
+	return sb.toString();
     }
 
     private static String getWorkingDirectory() {
-        return System.getProperty("user.dir") + File.separator;
+	return System.getProperty("user.dir") + File.separator;
     }
 
     private static boolean isFIXPasswordEncrypted() {
-        return Settings.getBoolean("FIXPasswordEncrypted", true);
+	return Settings.getBoolean("FIXPasswordEncrypted", true);
     }
 
     private static boolean isPasswordEncrypted() {
-        return Settings.getBoolean("PasswordEncrypted", true);
+	return Settings.getBoolean("PasswordEncrypted", true);
     }
 
     private static void printProperties() {
-        Properties p = System.getProperties();
-        Enumeration<Object> i = p.keys();
-        Utils.logRawToConsole("System Properties");
-        Utils.logRawToConsole("------------------------------------------------------------");
-        while (i.hasMoreElements()) {
-            String props = (String) i.nextElement();
-            Utils.logRawToConsole(props + " = " + (String) p.get(props));
-        }
-        Utils.logRawToConsole("------------------------------------------------------------");
+	Properties p = System.getProperties();
+	Enumeration<Object> i = p.keys();
+	Utils.logRawToConsole("System Properties");
+	Utils.logRawToConsole("------------------------------------------------------------");
+	while (i.hasMoreElements()) {
+	    String props = (String) i.nextElement();
+	    Utils.logRawToConsole(props + " = " + (String) p.get(props));
+	}
+	Utils.logRawToConsole("------------------------------------------------------------");
     }
 
     private static void startGateway() {
-        String[] twsArgs = new String[1];
-        twsArgs[0] = getTWSSettingsDirectory();
-        ibgateway.GWClient.main(twsArgs);
+	String[] twsArgs = new String[1];
+	twsArgs[0] = getTWSSettingsDirectory();
+	ibgateway.GWClient.main(twsArgs);
     }
 
     private static void startIBControllerServer() {
-        MyCachedThreadPool.getInstance().execute(new IBControllerServer());
+	MyCachedThreadPool.getInstance().execute(new IBControllerServer());
+    }
+
+    private static void registerShutdownHook() {
+	Runtime.getRuntime().addShutdownHook(new Thread() {
+	    @Override
+	    public void run()
+	    {
+		Utils.logToConsole("Received interrupt, will shut down...");
+		(new StopTask(null)).run();     // run on the current thread
+	    }
+	});
     }
 
     private static void startShutdownTimerIfRequired() {
-        Date shutdownTime = getShutdownTime();
-        if (! (shutdownTime == null)) {
-            long delay = shutdownTime.getTime() - System.currentTimeMillis();
-            Utils.logToConsole((isGateway() ? "Gateway" : "TWS") +
-                            " will be shut down at " +
-                           (new SimpleDateFormat("yyyy/MM/dd HH:mm")).format(shutdownTime));
-            MyScheduledExecutorService.getInstance().schedule(new Runnable() {
-                @Override
-                public void run() {
-                    MyCachedThreadPool.getInstance().execute(new StopTask(null));
-                }
-            }, delay, TimeUnit.MILLISECONDS);
-        }
+	Date shutdownTime = getShutdownTime();
+	if (! (shutdownTime == null)) {
+	    long delay = shutdownTime.getTime() - System.currentTimeMillis();
+	    Utils.logToConsole((isGateway() ? "Gateway" : "TWS") +
+			    " will be shut down at " +
+			   (new SimpleDateFormat("yyyy/MM/dd HH:mm")).format(shutdownTime));
+	    MyScheduledExecutorService.getInstance().schedule(new Runnable() {
+		@Override
+		public void run() {
+		    MyCachedThreadPool.getInstance().execute(new StopTask(null));
+		}
+	    }, delay, TimeUnit.MILLISECONDS);
+	}
     }
 
     private static void startTws() {
-        if (Settings.getBoolean("ShowAllTrades", false)) {
-            MyCachedThreadPool.getInstance().execute(new Runnable () {
-                @Override public void run() {TwsListener.showTradesLogWindow();}
-            });
-        }
-        String[] twsArgs = new String[1];
-        twsArgs[0] = getTWSSettingsDirectory();
-        jclient.LoginFrame.main(twsArgs);
+	if (Settings.getBoolean("ShowAllTrades", false)) {
+	    MyCachedThreadPool.getInstance().execute(new Runnable () {
+		@Override public void run() {TwsListener.showTradesLogWindow();}
+	    });
+	}
+	String[] twsArgs = new String[1];
+	twsArgs[0] = getTWSSettingsDirectory();
+	jclient.LoginFrame.main(twsArgs);
     }
 
     private static void startTwsOrGateway() {
-        int portNumber = Settings.getInt("ForceTwsApiPort", 0);
-        if (portNumber != 0) MyCachedThreadPool.getInstance().execute(new ConfigureTwsApiPortTask(portNumber));
+	int portNumber = Settings.getInt("ForceTwsApiPort", 0);
+	if (portNumber != 0) MyCachedThreadPool.getInstance().execute(new ConfigureTwsApiPortTask(portNumber));
 
-        if (isGateway()) {
-            startGateway();
-        } else {
-            startTws();
-        }
-        Utils.sendConsoleOutputToTwsLog(!Settings.getBoolean("LogToConsole", false));
+	if (isGateway()) {
+	    startGateway();
+	} else {
+	    startTws();
+	}
+	Utils.sendConsoleOutputToTwsLog(!Settings.getBoolean("LogToConsole", false));
     }
-    
+
     private static void startSavingTwsSettingsAutomatically() {
-        TwsSettingsSaver.getInstance().initialise();
+	TwsSettingsSaver.getInstance().initialise();
     }
 
 }
-
