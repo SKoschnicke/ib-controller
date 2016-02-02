@@ -188,6 +188,20 @@ class TwsListener
         return getConfigDialog(-1, TimeUnit.MILLISECONDS);
     }
 
+    private static volatile JDialog _TrustedIpsInputDialog;
+
+    static JDialog getTrustedIpsInputDialog() {
+        return _TrustedIpsInputDialog;
+    }
+
+    static void setTrustedIpsInputDialog(JDialog window) {
+        _TrustedIpsInputDialog = window;
+    }
+
+    static void clearTrustedIpsInputDialog() {
+        _TrustedIpsInputDialog = null;
+    }
+
     static String getFIXPassword() {
         return _FIXPassword;
     }

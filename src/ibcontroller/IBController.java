@@ -23,6 +23,7 @@ import java.awt.Toolkit;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -552,6 +553,9 @@ public class IBController {
     private static void startTwsOrGateway() {
 	int portNumber = Settings.getInt("ForceTwsApiPort", 0);
 	if (portNumber != 0) MyCachedThreadPool.getInstance().execute(new ConfigureTwsApiPortTask(portNumber));
+
+	boolean allowExternalIps = Settings.getBoolean("AllowExternalIps", false);
+	MyCachedThreadPool.getInstance().execute(new ConfigureTwsAllowExternalIpsTask(allowExternalIps));
 
 	if (isGateway()) {
 	    startGateway();
