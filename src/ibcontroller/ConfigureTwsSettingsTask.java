@@ -26,10 +26,12 @@ class ConfigureTwsSettingsTask implements Runnable{
     
     final int mPortNumber;
     final Boolean mAllowExternalIps;
+    final Boolean mReadOnlyApi;
     
-    ConfigureTwsSettingsTask(int portNumber, Boolean allow) {
+    ConfigureTwsSettingsTask(int portNumber, Boolean allow, Boolean readOnlyApi) {
         mPortNumber = portNumber;
         mAllowExternalIps = allow;
+        mReadOnlyApi = readOnlyApi;
     }
 
     @Override
@@ -39,7 +41,7 @@ class ConfigureTwsSettingsTask implements Runnable{
             
             GuiExecutor.instance().execute(new Runnable(){
                 @Override
-                public void run() {configure(configDialog, mPortNumber, mAllowExternalIps);}
+                public void run() {configure(configDialog, mPortNumber, mAllowExternalIps, mReadOnlyApi);}
             });
 
         } catch (Exception e){
@@ -53,7 +55,7 @@ class ConfigureTwsSettingsTask implements Runnable{
      * code overly complex due to synchronization requirements (only
      * one thread may access the configuration dialog at a time).
      */
-    private void configure(final JDialog configDialog, final int portNumber, final Boolean allowExternalIps) {
+    private void configure(final JDialog configDialog, final int portNumber, final Boolean allowExternalIps, final Boolean readOnlyApi) {
         try {
             Utils.logToConsole("Performing configuration");
             
@@ -96,6 +98,21 @@ class ConfigureTwsSettingsTask implements Runnable{
                     throw new IBControllerException("could not find \"Allow connections from localhost only\" checkbox");
                 }
             }
+
+            if (readOnlyApi != null) {
+                JCheckBox readOnlyApiCheckbox = Utils.findCheckBox(configDialog, "Read-Only API");
+                if (readOnlyApiCheckbox != null) {
+                    if (readOnlyApiCheckbox.isSelected() == readOnlyApi) {
+                        Utils.logToConsole("TWS API is already " + (readOnlyApiCheckbox.isSelected() ? "read-only." : "read and write."));
+                    } else {
+                        readOnlyApiCheckbox.setSelected(readOnlyApi);
+                        Utils.logToConsole("TWS API set to " + (readOnlyApiCheckbox.isSelected() ? "read-only." : "read and write."));
+                    }
+                } else {
+                    throw new IBControllerException("could not find \"Read-Only API\" checkbox");
+                }
+            }
+
 
             Utils.clickButton(configDialog, "OK");
 

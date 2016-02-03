@@ -560,7 +560,14 @@ public class IBController {
             allowExternalIps = Boolean.valueOf(allowExternalIpsString);
         }
 
-        MyCachedThreadPool.getInstance().execute(new ConfigureTwsSettingsTask(portNumber, allowExternalIps));
+        // not setting ReadOnlyApi or setting it to an empty string should mean "don't change"
+        String readOnlyApiString = Settings.getString("ReadOnlyApi", "");
+	Boolean readOnlyApi = null;
+        if (readOnlyApiString != "") {
+            readOnlyApi = Boolean.valueOf(readOnlyApiString);
+        }
+
+        MyCachedThreadPool.getInstance().execute(new ConfigureTwsSettingsTask(portNumber, allowExternalIps, readOnlyApi));
 
 	if (isGateway()) {
 	    startGateway();
