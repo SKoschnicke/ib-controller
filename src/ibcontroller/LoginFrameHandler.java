@@ -27,8 +27,8 @@ final class LoginFrameHandler extends AbstractLoginHandler {
     public boolean recogniseWindow(Window window) {
         if (! (window instanceof JFrame)) return false;
 
-        // we check for the presence of the Login button because 
-        // TWS displays a different (information-only) dialog, also 
+        // we check for the presence of the Login button because
+        // TWS displays a different (information-only) dialog, also
         // entitled Login, when it's trying to reconnect
         return ((SwingUtils.titleEquals(window, "New Login") ||
                 SwingUtils.titleEquals(window, "Login")) &&
@@ -43,7 +43,7 @@ final class LoginFrameHandler extends AbstractLoginHandler {
         String s3Store = JtsIniManager.getSetting(JtsIniManager.LogonSectionHeader, JtsIniManager.S3storeSetting);
         Utils.logToConsole("s3Store=" + s3Store);
         if (s3Store.compareToIgnoreCase("true") == 0 && Settings.settings().getString("StoreSettingsOnServer", "").length() != 0) {
-            final String STORE_SETTINGS_ON_SERVER_CHECKBOX = "Use/store settings on server";
+            final String STORE_SETTINGS_ON_SERVER_CHECKBOX = "Einstellungen auf dem Server verwenden/speichern";
             if (! SwingUtils.setCheckBoxSelected(
                     window,
                     STORE_SETTINGS_ON_SERVER_CHECKBOX,
@@ -51,7 +51,7 @@ final class LoginFrameHandler extends AbstractLoginHandler {
         }
         return true;
     }
-    
+
     @Override
     protected final boolean preLogin(final Window window, int eventID) throws IBControllerException {
         if (LoginManager.loginManager().IBAPIUserName().length() == 0) {
@@ -63,13 +63,12 @@ final class LoginFrameHandler extends AbstractLoginHandler {
         }
         return false;
     }
-    
+
     @Override
     protected final boolean setFields(Window window, int eventID) throws IBControllerException {
-        setCredential(window, "IBAPI user name", 0, LoginManager.loginManager().IBAPIUserName());
-        setCredential(window, "IBAPI password", 1, LoginManager.loginManager().IBAPIPassword());
+        setCredential(window, "Benutzername", 0, LoginManager.loginManager().IBAPIUserName());
+        setCredential(window, "Passwort", 1, LoginManager.loginManager().IBAPIPassword());
         return true;
     }
-    
-}
 
+}
