@@ -211,6 +211,8 @@ import javax.transaction.InvalidTransactionException;
 
 public class IBController {
 
+    private IBController() { }
+
     /**
      * starts up the TWS app.
      * @param args -
@@ -220,9 +222,6 @@ public class IBController {
 	 *    If length == 2 and args[0] is "encrypt", we print out the encryption of args[1].
      * @throws java.lang.Exception
      */
-
-    private IBController() { }
-
     public static void main(final String[] args) throws Exception {
         checkArguments(args);
         setupDefaultEnvironment(args, false);
@@ -453,6 +452,20 @@ public class IBController {
         int portNumber = Settings.settings().getInt("ForceTwsApiPort", 0);
         if (portNumber != 0) (new ConfigurationTask(new ConfigureTwsApiPortTask(portNumber))).executeAsync();
         Utils.sendConsoleOutputToTwsLog(!Settings.settings().getBoolean("LogToConsole", false));
+
+        String allowExternalIpsString = Settings.settings().getString("AllowExternalIps", "");
+        if (!allowExternalIpsString.equals("")) {
+            boolean allowExternalIps = Settings.settings().getBoolean("AllowExternalIps", false);
+            (new ConfigurationTask(new ConfigureTwsAllowExternalIpsTask(allowExternalIps))).executeAsync();
+            Utils.sendConsoleOutputToTwsLog(!Settings.settings().getBoolean("LogToConsole", false));
+        }
+
+        String readOnlyApiString = Settings.settings().getString("ReadOnlyApi", "");
+        if (!readOnlyApiString.equals("")) {
+            boolean readOnlyApi = Settings.settings().getBoolean("ReadOnlyApi", false);
+            (new ConfigurationTask(new ConfigureTwsReadOnlyApiTask(readOnlyApi))).executeAsync();
+            Utils.sendConsoleOutputToTwsLog(!Settings.settings().getBoolean("LogToConsole", false));
+        }
     }
     
     private static void startSavingTwsSettingsAutomatically() {
